@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginxaffinitysoftapp
+spec:
+  selector:
+    matchLabels:
+      app: nginxaffinitysoftapp
+  template:
+    metadata:
+      labels:
+        app: nginxaffinitysoftapp
+    spec:
+      affinity:
+        nodeAffinity: 
+         preferredDuringSchedulingIgnoredDuringExecution: 
+          - weight: 1
+            preference:
+              matchExpressions: 
+              - key: disktype
+                operator: In
+                values: 
+                - hdd
+      containers:
+      - name: nginxaffinitysoftapp
+        image: nginx
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginxdemoappsvc
+spec:
+  selector:
+    app: nginxaffinitysoftapp
+  ports:
+  - port: 8080
+    targetPort: 80
+  type: LoadBalancer
+

@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginxdemoapp
+spec:
+  selector:
+    matchLabels:
+      app: nginxdemoapp
+  template:
+    metadata:
+      labels:
+        app: nginxdemoapp
+    spec:
+      nodeSelector:
+        nkey: node2
+      containers:
+      - name: nginxdemoapp
+        image: nginx
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: dotnetdemoappsvc
+spec:
+  selector:
+    app: nginxdemoapp
+  ports:
+  - port: 8080
+    targetPort: 80
+  type: LoadBalancer
+
